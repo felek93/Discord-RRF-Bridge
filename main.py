@@ -6,6 +6,7 @@ MaxMessageLength = 2000
 
 urlIP = 'http://<printer ip address>'
 urlGCode = urlIP + '/rr_gcode?gcode='
+urlModel = urlIP + '/rr_model?flags=d99fn'
 urlReply = urlIP + '/rr_reply'
 
 TOKEN = '<yout discord bot token>'
@@ -22,7 +23,12 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    #print(message.content)
+    if message.content.startswith('@status'):
+        with urllib.request.urlopen(urlModel) as url:
+            data = json.loads(url.read().decode())
+            await message.channel.send('Printer status: ' + data['result']['state']['status'])
+            return
+
     with urllib.request.urlopen(urlGCode + message.content.replace(' ','%20')) as url:
         data = json.loads(url.read().decode())
         #print(data)
@@ -40,9 +46,6 @@ async def on_message(message):
                 while i < index:
                     await message.channel.send(reply[i * MaxMessageLength : i * MaxMessageLength + MaxMessageLength])
                     i += 1
-
-    if message.content.startswith('@status'):
-        await message.channel.send('... future ...')
 
 client.run(TOKEN)
 
