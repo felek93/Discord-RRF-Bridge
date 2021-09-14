@@ -23,7 +23,7 @@ async def on_message(message):
         return
 
     #print(message.content)
-    with urllib.request.urlopen(urlGCode + message.content) as url:
+    with urllib.request.urlopen(urlGCode + message.content.replace(' ','%20')) as url:
         data = json.loads(url.read().decode())
         #print(data)
     
